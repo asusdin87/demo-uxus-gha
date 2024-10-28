@@ -1,0 +1,99 @@
+version: '3.4'
+services:
+  testingdev-postgres:
+    image: postgres:16.1
+    container_name: "testingdev-postgres"
+    restart: always
+    ports:
+     - "5494:5432"
+    #~ env_file: .env
+    environment:
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./postgresql.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
+      - db-data:/var/lib/postgresql/data:Z
+    networks:
+      frontend-net:
+       ipv4_address: 172.90.15.4
+
+  testingdev-odoo:
+    image: odoo:17.0
+    hostname: testingdev.uxusolutions.com
+    container_name: "testingdev-odoo"
+    restart: always
+    mem_limit: 1000000000
+    memswap_limit: 2000000000
+    mem_reservation: 512m
+    cpu_count: 2
+    cpu_percent: 50
+    cpus: 0.5
+    cpu_shares: 73
+    cpuset: 0,1
+    ports:
+      - "8094:8069"
+    #~ env_file: .env
+    environment:
+      - HOST=testingdev-postgres
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - ./odoo.conf:/etc/odoo/odoo.conf
+      # - odoo-conf:/etc/odoo/
+      # Use named volumes to preserve data
+      - odoo-web-data:/var/lib/odoo
+      # Mount custom addons
+      - /mnt/uxus-addons/testing-dev-addons/:/mnt/extra-addons
+    depends_on:
+     - testingdev-postgres
+    networks:
+      frontend-net:
+        ipv4_address: 172.90.15.5
+
+  testingdev-pgadmin4:
+    image: dpage/pgadmin4:8.12
+    container_name: "testingdev-pgadmin4"
+    restart: always
+    mem_limit: 1000000000
+    memswap_limit: 2000000000
+    mem_reservation: 512m
+    cpu_count: 2
+    cpu_percent: 50
+    cpus: 0.5
+    cpu_shares: 73
+    cpuset: 0,1
+    ports:
+     - "8894:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=testingdev@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=testingdev
+    volumes:
+      - pgadmin4-data:/var/lib/pgadmin:Z
+    depends_on:
+     - testingdev-postgres
+    networks:
+      frontend-net:
+        ipv4_address: 172.90.15.6
+
+volumes:
+  db-data:
+    driver: local
+#  odoo-conf:
+#    driver: local
+  odoo-web-data:
+    driver: local
+  pgadmin4-data:
+    driver: local
+
+networks:
+  frontend-net:
+    driver: bridge
+    enable_ipv6: false
+    external: false
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.90.15.0/24
+        gateway: 172.90.15.1
