@@ -1,11 +1,11 @@
 version: '3.4'
 services:
-  testingdev-postgres:
+  demodev-postgres:
     image: postgres:16.1
-    container_name: "testingdev-postgres"
+    container_name: "demodev-postgres"
     restart: always
-    ports:
-     - "5494:5432"
+    # ports:
+    #  - "5494:5432"
     #~ env_file: .env
     environment:
       - POSTGRES_PASSWORD=odoo
@@ -17,12 +17,12 @@ services:
       - db-data:/var/lib/postgresql/data:Z
     networks:
       frontend-net:
-       ipv4_address: 172.90.15.4
+       ipv4_address: 172.90.155.4
 
-  testingdev-odoo:
+  demodev-odoo:
     image: odoo:17.0
-    hostname: testingdev.uxusolutions.com
-    container_name: "testingdev-odoo"
+    hostname: demodev.uxusolutions.com
+    container_name: "demodev-odoo"
     restart: always
     mem_limit: 1000000000
     memswap_limit: 2000000000
@@ -33,10 +33,10 @@ services:
     cpu_shares: 73
     cpuset: 0,1
     ports:
-      - "8094:8069"
+      - "8099:8069"
     #~ env_file: .env
     environment:
-      - HOST=testingdev-postgres
+      - HOST=demodev-postgres
       - USER=odoo
       - PASSWORD=odoo
     volumes:
@@ -47,14 +47,14 @@ services:
       # Mount custom addons
       # - /mnt/uxus-addons/testing-dev-addons/:/mnt/extra-addons
     depends_on:
-     - testingdev-postgres
+     - demodev-postgres
     networks:
       frontend-net:
-        ipv4_address: 172.90.15.5
+        ipv4_address: 172.90.155.5
 
-  testingdev-pgadmin4:
+  demodev-pgadmin4:
     image: dpage/pgadmin4:8.12
-    container_name: "testingdev-pgadmin4"
+    container_name: "demodev-pgadmin4"
     restart: always
     mem_limit: 1000000000
     memswap_limit: 2000000000
@@ -67,15 +67,15 @@ services:
     ports:
      - "8894:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=testingdev@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=testingdev
+      - PGADMIN_DEFAULT_EMAIL=demodev@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=demodev
     volumes:
       - pgadmin4-data:/var/lib/pgadmin:Z
     depends_on:
-     - testingdev-postgres
+     - demodev-postgres
     networks:
       frontend-net:
-        ipv4_address: 172.90.15.6
+        ipv4_address: 172.90.155.6
 
 volumes:
   db-data:
@@ -95,5 +95,5 @@ networks:
     ipam:
       driver: default
       config:
-      - subnet: 172.90.15.0/24
-        gateway: 172.90.15.1
+      - subnet: 172.90.155.0/24
+        gateway: 172.90.155.1
