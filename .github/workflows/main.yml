@@ -1,5 +1,5 @@
 on: push
-  name: Deploy to Docker swarm
+name: Deploy to Docker swarm
   uses: wshihadeh/docker-deployment-action@v1
   with:
     remote_docker_host: root@31.220.108.134
