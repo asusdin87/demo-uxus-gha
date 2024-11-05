@@ -27,7 +27,7 @@ jobs:
     #~ - uses: actions/checkout@master
 
       # Runs a single command using the runners shell
-    - name: Deploy to Docker Host
+    - name: Deploy to Docker Host 5
       uses: wshihadeh/docker-deployment-action@v1
       with:
         remote_docker_host: root@uxusolutions.com
