@@ -2,8 +2,7 @@ name: Example usage
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   build:
