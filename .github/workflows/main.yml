@@ -5,8 +5,8 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  #~ build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,17 +25,3 @@ jobs:
         stack_file_name: docker-compose.yaml
         keep_files: 5
         args: demo-dev
-
-    #~ - name: Start Deployment without copy
-      #~ uses: wshihadeh/docker-deployment-action@master
-      #~ with:
-        #~ remote_docker_host: ${{ secrets.HOST }}
-        #~ ssh_private_key: ${{ secrets.PRIVATE_KEY }}
-        #~ ssh_public_key: ${{ secrets.PUBLIC_KEY }}
-        #~ deployment_mode: docker-compose
-        #~ copy_stack_file: false
-        #~ deploy_path: /root/asusdin87/deploy/demo-dev/
-        #~ stack_file_name: docker-compose.yml
-        #~ pull_images_first: true
-        #~ keep_files: 3
-        #~ args: -p demodev up -d
