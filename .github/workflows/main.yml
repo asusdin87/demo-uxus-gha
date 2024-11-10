@@ -32,7 +32,7 @@ jobs:
         with:
           switches: -avzr --delete
           path: ./
-          remote_path: /root/asusdin87/deploy/
+          remote_path: /root/asusdin87/deploy/demo-dev/
           remote_host: ${{ secrets.REMOTE_HOSTNAME }}
           remote_user: ${{ secrets.REMOTE_USER }}
-          remote_key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+          remote_key: ${{ secrets.DOCKER_SSH_PUBLIC_KEY }}
