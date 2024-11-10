@@ -43,7 +43,7 @@ jobs:
           port: ${{ secrets.REMOTE_PORT }}
           script: |
             ls -lha
-            docker-compose -f $REMOTE_BASE_DIR/docker-compose.yaml ps -a
+            docker-compose -f /root/asusdin87/deploy/demo-dev/docker-compose.yaml ps -a
 
       - uses: mxschmitt/action-tmate@v3
         name: Setup tmate session      
