@@ -1,0 +1,95 @@
+version: '3.6'
+services:
+  demodev-postgres:
+    image: postgres:16.1
+    container_name: "demodev-postgres"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - POSTGRES_DB=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      # - ./postgresql.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
+      - db-data:/var/lib/postgresql/data:Z
+    networks:
+      frontend-net:
+       ipv4_address: 172.90.155.4
+
+  demodev-odoo:
+    image: odoo:17.0
+    hostname: demodev.uxusolutions.com
+    container_name: "demodev-odoo"
+    restart: always
+    mem_limit: 1000000000
+    memswap_limit: 2000000000
+    mem_reservation: 512m
+    cpu_count: 2
+    cpu_percent: 50
+    cpus: 0.5
+    cpu_shares: 73
+    cpuset: 0,1
+    ports:
+      - "8099:8069"
+    environment:
+      - HOST=demodev-postgres
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      # - ./odoo.conf:/etc/odoo/odoo.conf
+      - odoo-conf:/etc/odoo/
+      # Use named volumes to preserve data
+      - odoo-web-data:/var/lib/odoo
+      # Mount custom addons
+      # - /mnt/uxus-addons/testing-dev-addons/:/mnt/extra-addons
+    depends_on:
+     - demodev-postgres
+    networks:
+      frontend-net:
+        ipv4_address: 172.90.155.5
+
+  demodev-pgadmin4:
+    image: dpage/pgadmin4:8.12
+    container_name: "demodev-pgadmin4"
+    restart: always
+    mem_limit: 1000000000
+    memswap_limit: 2000000000
+    mem_reservation: 512m
+    cpu_count: 2
+    cpu_percent: 50
+    cpus: 0.5
+    cpu_shares: 73
+    cpuset: 0,1
+    ports:
+     - "8894:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=demodev@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=demodev
+    volumes:
+      - pgadmin4-data:/var/lib/pgadmin:Z
+    depends_on:
+     - demodev-postgres
+    networks:
+      frontend-net:
+        ipv4_address: 172.90.155.6
+
+volumes:
+  db-data:
+    driver: local
+  odoo-conf:
+    driver: local
+  odoo-web-data:
+    driver: local
+  pgadmin4-data:
+    driver: local
+
+networks:
+  frontend-net:
+    driver: bridge
+    enable_ipv6: false
+    external: false
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.90.155.0/24
+        gateway: 172.90.155.1
