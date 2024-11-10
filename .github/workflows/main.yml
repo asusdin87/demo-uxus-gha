@@ -1,4 +1,4 @@
-name: Continuous Deployment Workflow
+name: CD Workflow
 # This workflow is triggered whenever commits are pushed to the main branch
 on:
   push:
@@ -30,10 +30,10 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWD }}
           local_dir: './'
           remote_base_dir: '/root/asusdin87/deploy/demo-dev'
-          # remote_bak_path: '/home/username/backup'
+
 
       - uses: appleboy/ssh-action@v1.1.0
-        name: executing remote ssh commands using password
+        name: Executing remote ssh commands using password
         with:
           host: ${{ secrets.REMOTE_HOSTNAME }}
           username: ${{ secrets.REMOTE_USER }}
@@ -41,7 +41,8 @@ jobs:
           port: ${{ secrets.REMOTE_PORT }}
           script: whoami
 
-      - name: Setup tmate session
+      - uses: mxschmitt/action-tmate@v3
+        name: Setup tmate session      
         if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
+        
       
