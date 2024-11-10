@@ -27,15 +27,9 @@ jobs:
       - uses: actions/checkout@v4
         name: 'Checkout repository'
 
-      - name: Execute SSH commmands on remote server
-        uses: JimCronqvist/action-ssh@master
-        env:
-          REMOTE_HOST: ${{ secrets.REMOTE_HOSTNAME }}
-          REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          REMOTE_SSH_PRIVATE_KEY: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
-          NAME: "Root"
-
+      - uses: JimCronqvist/action-ssh@master
+        name: Execute SSH commmands on remote server       
         with:
-          hosts: '$REMOTE_USER@$REMOTE_HOST'
-          privateKey: $REMOTE_SSH_PRIVATE_KEY
+          hosts: 'root@$31.220.108.134'
+          privateKey: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
           command: ls -lah /root/asusdin87/deploy/
