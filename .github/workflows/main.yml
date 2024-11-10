@@ -53,8 +53,15 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWD }}
           port: ${{ secrets.REMOTE_PORT }}
           script: |
+            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose.yaml down >> /dev/null 2>&1
+            ls -lha
+            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose.yaml down >> /dev/null 2>&1
+            ls -lha
+            docker volume rm demodev_odoo-conf demodev_odoo-web-data demodev_pgadmin4-data >> /dev/null 2>&1
+            ls -lha
             docker-compose -f /root/asusdin87/deploy/demodev/docker-compose.yaml up -d >> /dev/null 2>&1
             ls -lha
+            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose.yaml ps -a
             
       - uses: mxschmitt/action-tmate@v3
         name: Setup tmate session      
