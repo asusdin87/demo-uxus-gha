@@ -20,7 +20,8 @@ jobs:
     steps:      
       - uses: actions/checkout@v4
         name: 'Checkout repository'
-      - uses: wshihadeh/docker-deployment-action@master
+
+      - uses: wshihadeh/docker-deployment-action@v2
         name: Start Deployment        
         with:
           remote_docker_host: ${{ secrets.REMOTE_HOSTNAME }}
@@ -32,4 +33,4 @@ jobs:
           stack_file_name: docker-compose.yml
           pull_images_first: false
           keep_files: 3
-          args: -p demodev up -d
+          args: up -d
