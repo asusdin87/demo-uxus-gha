@@ -15,7 +15,7 @@ defaults:
 jobs:
   deploy_staging:
     # environment: staging
-    name: 'Deploy to staging'
+    name: 'Deploy to Demo-Dev'
     runs-on: ubuntu-latest
     steps:      
       - uses: actions/checkout@v4
@@ -30,16 +30,21 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWD }}
           local_dir: './'
           remote_base_dir: '/root/asusdin87/deploy/demo-dev'
-
+    
 
       - uses: appleboy/ssh-action@v1.1.0
         name: Executing remote ssh commands using password
+        env:
+          REMOTE_BASE_DIR: /root/asusdin87/deploy/demo-dev
         with:
           host: ${{ secrets.REMOTE_HOSTNAME }}
           username: ${{ secrets.REMOTE_USER }}
           password: ${{ secrets.REMOTE_PASSWD }}
           port: ${{ secrets.REMOTE_PORT }}
-          script: whoami
+          script: |
+            docker-compose -f $REMOTE_BASE_DIR/docker-compose.yaml up -d
+            ls -lha
+            docker-compose -f $REMOTE_BASE_DIR/docker-compose.yaml ps -a
 
       - uses: mxschmitt/action-tmate@v3
         name: Setup tmate session      
