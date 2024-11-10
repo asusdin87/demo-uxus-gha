@@ -32,6 +32,15 @@ jobs:
           remote_base_dir: '/root/asusdin87/deploy/demo-dev'
           # remote_bak_path: '/home/username/backup'
 
+      - uses: appleboy/ssh-action@v1.1.0
+        name: executing remote ssh commands using password
+        with:
+          host: ${{ secrets.REMOTE_HOSTNAME }}
+          username: ${{ secrets.REMOTE_USER }}
+          password: ${{ secrets.REMOTE_PASSWD }}
+          port: ${{ secrets.REMOTE_PORT }}
+          script: whoami
+
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
