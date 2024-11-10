@@ -1,5 +1,4 @@
 name: Continuous Deployment Workflow
-
 # This workflow is triggered whenever commits are pushed to the main branch
 on:
   push:
@@ -8,25 +7,19 @@ on:
     paths:
       - './'
   workflow_dispatch:
-
 defaults:
   run:
     shell: bash
     # Define the working directory for all run steps in the workflow
     working-directory: ./
-
 jobs:
-
   deploy_staging:
     # environment: staging
     name: 'Deploy to staging'
     runs-on: ubuntu-latest
-
-    steps:
-      
+    steps:      
       - uses: actions/checkout@v4
         name: 'Checkout repository'
-
       - uses: wshihadeh/docker-deployment-action@master
         name: Start Deployment        
         with:
