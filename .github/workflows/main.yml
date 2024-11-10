@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
         name: 'Checkout repository'
 
-      - uses: asusdin87/ssh2-to-remote-action@v1
+      - uses: asusdin87/ssh2-to-remote-action@main
         name: Upload directory to SFTP server        
         with:
           host: ${{ secrets.REMOTE_HOSTNAME }}
