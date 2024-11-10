@@ -10,7 +10,7 @@ services:
       - POSTGRES_DB=postgres
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      # - ./postgresql.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
+      - ./postgresql.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
       - db-data:/var/lib/postgresql/data:Z
     networks:
       frontend-net:
@@ -36,12 +36,11 @@ services:
       - USER=odoo
       - PASSWORD=odoo
     volumes:
-      # - ./odoo.conf:/etc/odoo/odoo.conf
-      - odoo-conf:/etc/odoo/
+      - ./odoo.conf:/etc/odoo/odoo.conf
       # Use named volumes to preserve data
       - odoo-web-data:/var/lib/odoo
       # Mount custom addons
-      # - /mnt/uxus-addons/testing-dev-addons/:/mnt/extra-addons
+      - /mnt/uxus-addons/demodev-addons/:/mnt/extra-addons
     depends_on:
      - demodev-postgres
     networks:
