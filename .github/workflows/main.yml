@@ -15,7 +15,7 @@ defaults:
 jobs:
   deploy_staging:
     # environment: staging
-    name: 'Deploy to Demo-Dev'
+    name: 'Copy-Files to Demo-Dev'
     runs-on: ubuntu-latest
     steps:      
       - uses: actions/checkout@v4
@@ -37,9 +37,10 @@ jobs:
 
 
   deploy_producction:
-    # environment: staging
+    # environment: producction
     name: 'Deploy to Demo-Dev'
     runs-on: ubuntu-latest
+    needs: deploy_staging
     steps:      
       - uses: actions/checkout@v4
         name: 'Checkout repository'
