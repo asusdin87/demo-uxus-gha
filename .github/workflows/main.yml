@@ -32,4 +32,6 @@ jobs:
         with:
           hosts: 'root@$31.220.108.134'
           privateKey: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
-          command: ls -lah /root/asusdin87/deploy/
+          debug: true
+          command: |
+            ls -lah /root/asusdin87/deploy/
