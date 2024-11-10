@@ -31,6 +31,7 @@ jobs:
         name: 'Deploy to staging'
         with:
           switches: -avzr --delete
+          legacy_allow_rsa_hostkeys: "true"
           path: ./
           remote_path: /root/asusdin87/deploy/demo-dev/
           remote_host: ${{ secrets.REMOTE_HOSTNAME }}
