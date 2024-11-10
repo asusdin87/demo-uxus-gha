@@ -27,7 +27,7 @@ jobs:
           host: ${{ secrets.REMOTE_HOSTNAME }}
           port: ${{ secrets.REMOTE_PORT }}
           username: ${{ secrets.REMOTE_USER }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.REMOTE_PASSWD }}
           local_dir: './'
           remote_base_dir: '/root/asusdin87/deploy/demo-dev'
           # remote_bak_path: '/home/username/backup'
