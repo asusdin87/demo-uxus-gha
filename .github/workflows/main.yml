@@ -27,7 +27,7 @@ jobs:
           ssh_private_key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
           ssh_public_key: ${{ secrets.DOCKER_SSH_PUBLIC_KEY }}
           deployment_mode: docker-compose
-          deploy_path: /root/asusdin87/deploy/demo-dev/
+          deploy_path: /root/asusdin87/deploy/demo-dev
           copy_stack_file: true
           stack_file_name: docker-compose.yml
           pull_images_first: false
