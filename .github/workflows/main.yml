@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           password: ${{ secrets.REMOTE_PASSWD }}
           local_dir: './'
-          remote_base_dir: '/root/asusdin87/deploy/demo-dev'
+          remote_base_dir: '/root/asusdin87/deploy/demodev'
     
       - uses: mxschmitt/action-tmate@v3
         name: Setup tmate session      
@@ -47,15 +47,13 @@ jobs:
 
       - uses: appleboy/ssh-action@v1.1.0
         name: Executing remote ssh commands using password
-        env:
-          REMOTE_BASE_DIR: "/root/asusdin87/deploy/demo-dev"
         with:
           host: ${{ secrets.REMOTE_HOSTNAME }}
           username: ${{ secrets.REMOTE_USER }}
           password: ${{ secrets.REMOTE_PASSWD }}
           port: ${{ secrets.REMOTE_PORT }}
           script: |
-            docker-compose -f /root/asusdin87/deploy/demo-dev/docker-compose.yaml up -a
+            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose.yaml up -d >> /dev/null 2>&1
             ls -lha
             
       - uses: mxschmitt/action-tmate@v3
