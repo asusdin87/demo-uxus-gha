@@ -4,9 +4,6 @@ services:
     image: postgres:16.1
     container_name: "demodev-postgres"
     restart: always
-    # ports:
-    #  - "5494:5432"
-    #~ env_file: .env
     environment:
       - POSTGRES_PASSWORD=odoo
       - POSTGRES_USER=odoo
@@ -34,7 +31,6 @@ services:
     cpuset: 0,1
     ports:
       - "8099:8069"
-    #~ env_file: .env
     environment:
       - HOST=demodev-postgres
       - USER=odoo
