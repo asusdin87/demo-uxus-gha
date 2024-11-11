@@ -1,0 +1,157 @@
+name: Create Dev Staging Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      PR_number:
+        description: 'Pull request number'
+        required: true
+
+jobs:
+  create:
+    name: 'Create staging and deploy'
+    defaults:
+      run:
+        shell: bash
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+
+    # ======================================================
+    # It's important to check that the PR number 
+    # provided as input is valid and belongs to 
+    # the repository.
+    # 
+    # This will also return the PR's branch as an output
+    # which can be fetched in next steps via:
+    # ${{ steps.verify_pr_number.outputs.result }}
+    # ======================================================
+    - name: Verify Pull Request Number
+      uses: actions/github-script@v5
+      id: verify_pr_number
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        result-encoding: string
+        script: |
+          const response = await github.rest.pulls.get({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: ${{ github.event.inputs.PR_number }}
+          });
+          
+          // Check if the pull request is open
+          if (response.data.number !== ${{ github.event.inputs.PR_number }}) {
+            throw new Error('Pull request is not open or number is not valid!');
+          } else {
+            console.log("PR ref: " + response.data.head.ref);
+            return response.data.head.ref;
+          }
+
+    # ======================================================
+    # Checkout the branch infra and the repository
+    # ======================================================
+    - uses: actions/checkout@v2
+      name: 'Checkout repository and infra branch'
+      with:
+        ref: infra
+    
+    # ======================================================
+    # If everything goes well and the Terraform Plan was
+    # executed successfully, and the resources were created
+    # we need to commit the new resource file and push it
+    # to the infra branch.
+    # 
+    # If we don't do this, everytime this workflow runs
+    # it will destroy the resources created by previous
+    # runs. We need to persist the state in the repository
+    # for this to work.
+    # 
+    # Here we use a neat little trick:
+    # git commit -m "Add terraform resource files" && \
+    #      git push || echo "Nothing to commit"
+    #
+    # git push will fail with a non-zero exit if there 
+    # are no changes to commit and this will cause the workflow
+    # to fail. We don't want that. We can use the `|| echo`
+    # to print "Nothing to commit" to the console if 
+    # git push fails.
+    # ======================================================
+    #- name: Commit terraform resource files to the PR
+    #  working-directory: infra/instances/staging/
+    #  run: |
+    #    git config --global user.name '${{ github.actor }}'
+    #    git config --global user.email '${{ github.actor}}@users.noreply.github.com'
+    #    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+    #    git add ./\*.tf
+    #    git commit -m "Add terraform resource files" && \
+    #      git push || echo "Nothing to commit"
+
+    # ======================================================
+    # Checkout the PR branch so that we can deploy it
+    # ======================================================
+    - uses: actions/checkout@v2
+      name: 'Checkout PR branch'
+      with:
+        ref: ${{ steps.verify_pr_number.outputs.result }}
+
+    # ======================================================
+    # We sync the files in this directory to the staging
+    # server. We use the `rsync` command to do this.
+    # ======================================================
+    #- uses: burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
+    #  name: 'Deploy to staging'
+    #  with:
+    #    switches: -avzr --delete
+    #    path: ./web
+    #    remote_path: /var/app
+    #    remote_host: ${{ steps.apply_output.outputs.stdout }}
+    #    remote_user: ${{ secrets.REMOTE_USER }}
+    #    remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+    
+    # ======================================================
+    # Once we have the new files synced to the staging server
+    # we need to restart the staging server.
+    # ======================================================
+    #- uses: JimCronqvist/action-ssh@7737f1192ddd8376686e9d6354dea44592c942bf
+    #  name: Execute SSH commmands on remote server
+    #  with:
+    #    hosts: '${{ secrets.REMOTE_USER }}@${{ steps.apply_output.outputs.stdout }}'
+    #    privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
+    #    command: |
+    #      cd /var/app/web
+    #      npm ci
+    #      pm2 start /var/app/web/bin/www || pm2 restart /var/app/web/bin/www
+    #      sudo service nginx restart
+    
+    # ======================================================
+    # When we're done, we need to update the PR one more time
+    # with the results of the apply.
+    # ======================================================      
+    - name: Update status
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### Staging server created
+          > PR #${{ github.event.inputs.PR_number }} has been deployed successfully
+          
+          URL: http://${{ steps.apply_output.outputs.stdout }}`;
+
+          github.rest.issues.createComment({
+            issue_number: ${{ github.event.inputs.PR_number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+    
+    # ======================================================
+    # tmate is a nice little utility that allows us to
+    # ssh to the staging server and execute commands
+    # on the server in case any of the steps above fail.
+    #
+    # Otherwise this step will not be executed.
+    # ======================================================
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3

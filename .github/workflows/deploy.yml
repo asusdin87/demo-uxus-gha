@@ -1,12 +1,19 @@
 name: Continuous Deployment Workflow
 # This workflow is triggered whenever commits are pushed to the main branch
 on:
+  workflow_dispatch:
   push:
+    branches:
+      - 'main'
+      - 'staging'
+    paths:
+      - './'
+  pull_request:
     branches:
       - 'staging'
     paths:
       - './'
-  workflow_dispatch:
+  
 defaults:
   run:
     shell: bash
