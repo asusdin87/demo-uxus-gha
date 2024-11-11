@@ -1,0 +1,79 @@
+name: Continuous Deployment Workflow
+# This workflow is triggered whenever commits are pushed to the main branch
+on:
+  push:
+    branches:
+      - 'staging'
+    paths:
+      - './'
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+    # Define the working directory for all run steps in the workflow
+    working-directory: ./
+jobs:
+  deploy_staging:
+    # environment: staging
+    name: 'Copy-Files DemoDev Staging'
+    runs-on: ubuntu-latest
+    steps:      
+      - uses: actions/checkout@v4
+        name: 'Checkout repository'
+        with:
+          sparse-checkout: |
+            .github
+            README.md
+          sparse-checkout-cone-mode: false
+
+      - uses: asusdin87/ssh2-to-remote-action@main
+        name: Upload directory to SFTP server        
+        with:
+          host: ${{ secrets.REMOTE_HOSTNAME }}
+          port: ${{ secrets.REMOTE_PORT }}
+          username: ${{ secrets.REMOTE_USER }}
+          password: ${{ secrets.REMOTE_PASSWD }}
+          local_dir: './'
+          remote_base_dir: '/root/asusdin87/deploy/demodev'
+    
+      - uses: mxschmitt/action-tmate@v3
+        name: Setup tmate session      
+        if: ${{ failure() }}
+
+
+#  deploy_producction:
+#    # environment: producction
+#    name: 'Deploy DemoDev Staging'
+#    runs-on: ubuntu-latest
+#    needs: deploy_staging
+#    steps:      
+#      - uses: actions/checkout@v4
+#        name: 'Checkout repository'
+
+#      - uses: appleboy/ssh-action@v1.1.0
+#        name: Executing remote ssh commands using password
+#        with:
+#          host: ${{ secrets.REMOTE_HOSTNAME }}
+#          username: ${{ secrets.REMOTE_USER }}
+#          password: ${{ secrets.REMOTE_PASSWD }}
+#          port: ${{ secrets.REMOTE_PORT }}
+#          script: |
+#            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose-staging.yaml down >> /dev/null 2>&1
+#            echo "Executed the docker-compose down command - Step 1"
+#            sleep 3 /dev/null 2>&1
+#            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose-staging.yaml down >> /dev/null 2>&1
+#            echo "Executed the docker-compose down command - Step 2"
+#            sleep 3 /dev/null 2>&1
+#            docker volume rm demodev_odoo-conf demodev_odoo-web-data demodev_pgadmin4-data >> /dev/null 2>&1
+#            echo "Deleting unused docker volumes - Step 3"
+#            sleep 3 /dev/null 2>&1
+#            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose-staging.yaml up -d >> /dev/null 2>&1
+#            echo "Executed the docker-compose up -d command - Step 4"
+#            sleep 3 /dev/null 2>&1
+#            echo "Executed the docker-compose ps -a command - Step 5"
+#            docker-compose -f /root/asusdin87/deploy/demodev/docker-compose-staging.yaml ps -a
+
+
+#      - uses: mxschmitt/action-tmate@v3
+#        name: Setup tmate session      
+#        if: ${{ failure() }}
